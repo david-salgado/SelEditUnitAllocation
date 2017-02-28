@@ -1,0 +1,27 @@
+Package: SelEditUnitAllocation
+Type: Package
+Title: Implement classes and methods to allocate units in the optimization
+    approach to selective editing
+Version: 0.1.0
+Authors@R: c(
+    person("David", "Salgado", email = "david.salgado.fernandez@gmail.com", role = c("cre", "aut")),
+    person("Elisa", "Esteban", email = "elisa.esteban.segurado@gmail.com", role = "aut"),
+    person("Soledad", "Saldaña", email = "soledad.saldana.diaz@gmail.com", role = "aut"))
+Maintainer: David Salgado <david.salgado.fernandez@gmail.com>
+Description: Definition of S4 classes and methods to allocate units to be edited
+    interactively under the optimization approach to selective editing
+Depends:
+    R (>= 3.3.0)
+Imports:
+    methods (>= 3.3.0),
+    data.table (>= 1.10.0),
+    SelEditUnitAllocation (>= 0.0.1)
+License: file LICENSE
+Encoding: UTF-8
+LazyData: true
+Collate:
+    'UnitAllocParam-class.R'
+    'AllocateUnits.R'
+    'AllocatedUnits-class.R'
+    'AllocatedUnits.R'
+RoxygenNote: 5.0.1
