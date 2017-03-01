@@ -23,5 +23,4 @@ Collate:
     'UnitAllocParam-class.R'
     'AllocateUnits.R'
     'AllocatedUnits-class.R'
-    'AllocatedUnits.R'
 RoxygenNote: 5.0.1
