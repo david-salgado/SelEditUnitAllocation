@@ -3,5 +3,5 @@
 export(AllocateUnits)
 exportClasses(UnitAllocParam)
 exportMethods(AllocateUnits)
-import(SelEditUnitAllocation)
+import(SelEditUnitPriorit)
 import(data.table)

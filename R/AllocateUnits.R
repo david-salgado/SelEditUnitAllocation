@@ -26,7 +26,7 @@ setGeneric("AllocateUnits", function(object, Param){standardGeneric("AllocateUni
 #'
 #' @include UnitAllocParam-class.R
 #'
-#' @import SelEditUnitAllocation
+#' @import SelEditUnitPriorit
 #'
 #' @export
 setMethod(

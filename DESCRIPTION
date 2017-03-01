@@ -15,7 +15,7 @@ Depends:
 Imports:
     methods (>= 3.3.0),
     data.table (>= 1.10.0),
-    SelEditUnitAllocation (>= 0.0.1)
+    SelEditUnitPriorit (>= 0.0.1)
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
