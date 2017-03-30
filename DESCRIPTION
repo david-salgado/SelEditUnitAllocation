@@ -23,4 +23,6 @@ Collate:
     'UnitAllocParam-class.R'
     'AllocateUnits.R'
     'AllocatedUnits-class.R'
+    'CookAllocParam-class.R'
+    'CookAllocMeasure.R'
 RoxygenNote: 5.0.1
