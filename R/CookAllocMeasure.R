@@ -39,21 +39,33 @@ setMethod(
                    DomainNames, paste0('DesignW', Param@ObjVariables))
     IDQuals <- getIDQual(object@Data, 'MicroData')
     auxDT <- dcast_StQ(object@Data, ExtractNames(Variables))[, c(IDQuals, Variables), with = FALSE]
+    for (col in names(AllocDomains.DT)){
 
+      auxDT <- auxDT[!is.na(get(col))]
+
+    }
     AllocDomains.DT[, Prob := Param@Prob]
     AllocDomains.DT[, alpha := Param@alpha]
+
     auxDT <- merge(auxDT, AllocDomains.DT, all.x = TRUE, by = intersect(names(auxDT), names(AllocDomains.DT)))
     AllocDomains.DT[, Prob := NULL]
     AllocDomains.DT[, alpha := NULL]
+    for (DomainVar in DomainNames){
 
-    auxDT.list <- split(auxDT, auxDT[, DomainNames, with = FALSE])
+      auxDT <- auxDT[!is.na(get(DomainVar))]
+    }
+
+    auxDT.list <- split(auxDT, auxDT[, DomainNames, with = FALSE], drop = TRUE)
     DomainNames <- names(auxDT.list)
+
     outputList <- lapply(Param@ObjVariables, function(Var){
 
       VarOutput <- lapply(auxDT.list, function(DT){
 
           if (dim(DT)[[1]] <= 1) return(0)
           Pred <- paste0('Pred', Var)
+          DT <- DT[get(Var) != 0 & get(Pred) != 0]
+
           fit <- lm(get(Var) ~ get(Pred), data = DT)
           wName <- paste0('DesignW', Var)
           Cook <- DT[, get(wName) * cooks.distance(fit)]

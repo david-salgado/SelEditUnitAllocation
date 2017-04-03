@@ -80,7 +80,16 @@ setMethod(
 
     if (all(ndep >= CellSize)) {
 
-      output <- CellSize
+      Allocation <- CellSize
+
+      outputUnits <- lapply(seq(along = object@Units), function(indexDomain){
+
+        indexSelectedUnits <- which(object@UnitPriority[[indexDomain]] <= Allocation[indexDomain])
+        outLocal <- object@Units[[indexDomain]][indexSelectedUnits]
+        return(outLocal)
+
+      })
+      output <- new(Class = 'AllocatedUnits', Domains = object@Domains, Units = outputUnits)
       return(output)
 
     }
@@ -88,7 +97,6 @@ setMethod(
     if (sum(nmin) > ndep) stop("[SelEditUnitAllocation::AllocateUnits] The sum of AllocMin exceeds the maximum number of units to allocate MaxUnits.")
 
     Allocation <- nmin
-#    names(Allocation) <- names(CellSize)
 
     CellSize <- pmin(CellSize, nmax)
     if (any(nmin >= CellSize)) Allocation[nmin >= CellSize] <- CellSize[nmin >= CellSize]
@@ -118,7 +126,7 @@ setMethod(
       Allocation[Allocation >= CellSize] <- CellSize[Allocation >= CellSize]
       remainder <- ndep - sum(Allocation)
     }
-    if (remainder==0) return(Allocation)
+    if (remainder == 0) return(Allocation)
 
     Order.PropConst <- order(PropConst, decreasing = T)
     names(Allocation) <- paste0('Dom', seq(along = Allocation))
@@ -130,7 +138,10 @@ setMethod(
       increment[Order.Cells[Counter]] <- 1L
       Allocation <- Allocation + increment
       remainder <- ndep - sum(Allocation)
-      if (Counter == length(Allocation)) {Counter <- 1L
+      if (Counter == length(Allocation)) {
+
+        Counter <- 1L
+
       } else Counter <- Counter + 1L
     }
     names(Allocation) <- NULL

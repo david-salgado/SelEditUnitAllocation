@@ -28,21 +28,15 @@
 #' @import data.table
 #'
 #' @export
-setClass(Class = "UnitAllocParam",
+setClass(Class = "AllocatedUnits",
          slots = c(Domains = 'data.table',
-                   MaxAlloc = 'integer',
-                   MinAlloc = 'integer',
-                   AllocFactors = 'list',
-                   DomainWeights = 'numeric',
-                   MaxUnits = 'integer'),
+                   Units = 'list'),
          prototype = list(Domains = data.table::data.table(NULL),
-                          MaxAlloc = integer(0),
-                          MinAlloc = integer(0),
-                          AllocFactors = list(),
-                          DomainWeights = numeric(0),
-                          MaxUnits = integer(0)),
+                          Units = list()),
          validity = function(object){
 
+
+           if (dim(object@Domains)[1] != length(object@Units)) stop()
 
            return(TRUE)
          }

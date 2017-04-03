@@ -21,7 +21,8 @@
 #'                       AllocFactors = list(c(0.43, 0.12, 0.234, 0.123, 0.934, 0.23, 0.754, 0.423, 0.923, 0.345, 0.512, 0.623),
 #'                                           c(0.43, 0.123, 0.34, 0.3, 0.34, 0.13, 0.954, 0.523, 0.223, 0.445, 0.522, 0.323)),
 #'                       DomainWeights = c(0.34, 0.12, 0.1, 1, 123, 0.12, 56, 123, 98, 12, 23, 87),
-#'                       MaxUnits = 265L )
+#'                       MaxUnits = 265L,
+#'                       ExcUnits = data.table(NULL))
 #'
 #' @import data.table
 #'
@@ -32,13 +33,15 @@ setClass(Class = "UnitAllocParam",
                    MinAlloc = 'integer',
                    AllocFactors = 'list',
                    DomainWeights = 'numeric',
-                   MaxUnits = 'integer'),
+                   MaxUnits = 'integer',
+                   ExcUnits = 'data.table'),
          prototype = list(Domains = data.table::data.table(NULL),
                           MaxAlloc = integer(0),
                           MinAlloc = integer(0),
                           AllocFactors = list(),
                           DomainWeights = numeric(0),
-                          MaxUnits = integer(0)),
+                          MaxUnits = integer(0),
+                          ExcUnits = data.table::data.table(NULL)),
          validity = function(object){
 
 
