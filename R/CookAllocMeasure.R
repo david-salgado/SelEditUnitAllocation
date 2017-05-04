@@ -47,13 +47,13 @@ setMethod(
     AllocDomains.DT[, Prob := Param@Prob]
     AllocDomains.DT[, alpha := Param@alpha]
 
-    auxDT <- merge(auxDT, AllocDomains.DT, all.x = TRUE, by = intersect(names(auxDT), names(AllocDomains.DT)))
-    AllocDomains.DT[, Prob := NULL]
-    AllocDomains.DT[, alpha := NULL]
-    for (DomainVar in DomainNames){
+    for (DomainVar in setdiff(DomainNames, c('Prob', 'alpha'))){
 
       auxDT <- auxDT[!is.na(get(DomainVar))]
     }
+    auxDT <- merge(auxDT, AllocDomains.DT, all.x = TRUE, by = intersect(names(auxDT), names(AllocDomains.DT)))
+    AllocDomains.DT[, Prob := NULL]
+    AllocDomains.DT[, alpha := NULL]
 
     auxDT.list <- split(auxDT, auxDT[, DomainNames, with = FALSE], drop = TRUE)
     DomainNames <- names(auxDT.list)
