@@ -34,8 +34,18 @@ setMethod(
   signature = c("UnitPrioritization", "UnitAllocParam"),
   function(object, Param){
 
+    Units <- object@Units
+    ExcUnits <- Param@ExcUnits
+    setkeyv(ExcUnits, names(ExcUnits))
+    if (!all(unique(unlist(lapply(Units, names))) == names(ExcUnits))) stop('[SelEditUnitAllocation:AllocateUnits] Statistical units in object and Param are specified in the same way.\n')
+    Units <- lapply(Units, function(DT){
 
-    CellSize <- as.integer(unlist(lapply(object@Units, function(x){dim(x)[[1]]})))
+      setkeyv(DT, names(DT))
+      out <- DT[!ExcUnits]
+      return(out)
+    })
+
+    CellSize <- as.integer(unlist(lapply(Units, function(x){dim(x)[[1]]})))
     nCells <- length(CellSize)
 
     if (Param@MaxUnits == 0) {
@@ -69,30 +79,43 @@ setMethod(
       } else {
 
         return(exp(sum(Weights * log(x)) / sum(Weights)))
-
       }
     }
 
 
     nFactors <- length(FactorList)
-#    nFactComp <- lapply(FactorList, length)
+    Priority <- lapply(seq(along = object@Units), function(index){
 
+      out <- copy(object@Units[[index]])
+      setkeyv(out, names(out))
+      out[, Priority := object@UnitPriority[[index]]]
+      out <- out[Units[[index]]]
+      setkeyv(out, 'Priority')
+      out[, NewPriority := seq(along = out[[1]])]
+      out[, Priority := NULL]
+      setnames(out, 'NewPriority', 'Priority')
+      setkeyv(out, setdiff(names(out), 'Priority'))
+      out <- out[['Priority']]
+      return(out)
+    })
 
-    if (all(ndep >= CellSize)) {
+#    if (all(ndep >= CellSize)) {
 
-      Allocation <- CellSize
+#      Allocation <- CellSize
+#return(list(Priority, Allocation))
+#      outputUnits <- lapply(seq(along = Units), function(indexDomain){
 
-      outputUnits <- lapply(seq(along = object@Units), function(indexDomain){
+#        indexSelectedUnits <- which(Priority[[indexDomain]] <= Allocation[indexDomain])
+#return(indexSelectedUnits)
+#        outLocal <- Units[[indexDomain]][indexSelectedUnits]
+#        return(outLocal)
 
-        indexSelectedUnits <- which(object@UnitPriority[[indexDomain]] <= Allocation[indexDomain])
-        outLocal <- object@Units[[indexDomain]][indexSelectedUnits]
-        return(outLocal)
+#      })
+#return(outputUnits)
+#      output <- new(Class = 'AllocatedUnits', Domains = object@Domains, Units = outputUnits)
+#      return(output)
 
-      })
-      output <- new(Class = 'AllocatedUnits', Domains = object@Domains, Units = outputUnits)
-      return(output)
-
-    }
+#    }
 
     if (sum(nmin) > ndep) stop("[SelEditUnitAllocation::AllocateUnits] The sum of AllocMin exceeds the maximum number of units to allocate MaxUnits.")
 
@@ -146,10 +169,10 @@ setMethod(
     }
     names(Allocation) <- NULL
 
-    outputUnits <- lapply(seq(along = object@Units), function(indexDomain){
+    outputUnits <- lapply(seq(along = Units), function(indexDomain){
 
-      indexSelectedUnits <- which(object@UnitPriority[[indexDomain]] <= Allocation[indexDomain])
-      outLocal <- object@Units[[indexDomain]][indexSelectedUnits]
+      indexSelectedUnits <- which(Priority[[indexDomain]] <= Allocation[indexDomain])
+      outLocal <- Units[[indexDomain]][indexSelectedUnits]
       return(outLocal)
 
     })
