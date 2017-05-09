@@ -35,4 +35,3 @@ UnitAllocParam <- new(Class = 'UnitAllocParam',
 AllocateUnits(PriorUnits, UnitAllocParam)
 }
 }
-

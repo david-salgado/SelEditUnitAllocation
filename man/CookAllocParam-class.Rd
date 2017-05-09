@@ -24,6 +24,7 @@ of each domain for the allocation.}
 
 \item{\code{MaxUnits}}{Integer vector of length 1 with the maximal number of units to allocate.}
 }}
+
 \examples{
 CookAllocParam <- new(Class = 'CookAllocParam',
                       ObjVariables = c('CifraNeg_13.___', 'Personal_07._____705:1.-2.'),
@@ -32,4 +33,3 @@ CookAllocParam <- new(Class = 'CookAllocParam',
                       alpha = 2 )
 
 }
-
