@@ -61,10 +61,11 @@ setMethod(
     outputList <- lapply(Param@ObjVariables, function(Var){
 
       VarOutput <- lapply(auxDT.list, function(DT){
-
+          
           if (dim(DT)[[1]] <= 1) return(0)
           Pred <- paste0('Pred', Var)
           DT <- DT[get(Var) != 0 & get(Pred) != 0]
+          if (dim(DT)[1] == 0) return(0)
 
           fit <- lm(get(Var) ~ get(Pred), data = DT)
           wName <- paste0('DesignW', Var)

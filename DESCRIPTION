@@ -2,7 +2,7 @@ Package: SelEditUnitAllocation
 Type: Package
 Title: Implement classes and methods to allocate units in the optimization
     approach to selective editing
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("David", "Salgado", email = "david.salgado.fernandez@gmail.com", role = c("cre", "aut")),
     person("Elisa", "Esteban", email = "elisa.esteban.segurado@gmail.com", role = "aut"),
