@@ -85,15 +85,14 @@ setMethod(
 
     nFactors <- length(FactorList)
     Priority <- lapply(seq(along = object@Units), function(index){
-
       out <- copy(object@Units[[index]])
-      setkeyv(out, names(out))
-      out[, Priority := object@UnitPriority[[index]]]
-      out <- out[Units[[index]]]
-      setkeyv(out, 'Priority')
+      out <- out[object@UnitPriority[[index]]]
+      #out[, Priority := object@UnitPriority[[index]]]
       out[, NewPriority := seq(along = out[[1]])]
-      out[, Priority := NULL]
-      setnames(out, 'NewPriority', 'Priority')
+      out <- merge(out, Units[[index]], by =  names(Units[[index]]))
+      setkeyv(out, 'NewPriority')
+      out[, Priority := seq(along = out[[1]])]
+      out[, NewPriority := NULL]
       setkeyv(out, setdiff(names(out), 'Priority'))
       out <- out[['Priority']]
       return(out)
