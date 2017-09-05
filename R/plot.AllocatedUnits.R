@@ -79,7 +79,7 @@ setMethod(f = "plot",
                 }
               }))
 
-              SelectedUnits <- x@Units[[which(InDomainSel)]]
+              SelectedUnits <- copy(x@Units)[[which(InDomainSel)]]
               setkeyv(SelectedUnits, IDQual)
 
 
@@ -146,7 +146,7 @@ setMethod(f = "plot",
                 }
               }))
 
-              SelectedUnits <- x@Units[[which(InDomainSel)]]
+              SelectedUnits <- copy(x@Units)[[which(InDomainSel)]]
               setkeyv(SelectedUnits, IDQual)
               Units <- merge(ExtraPar$UnitParam, QueriedDomain, by = names(QueriedDomain))
 
