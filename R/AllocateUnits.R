@@ -38,10 +38,33 @@ setMethod(
     ExcUnits <- Param@ExcUnits
     setkeyv(ExcUnits, names(ExcUnits))
     if (!all(unique(unlist(lapply(Units, names))) == names(ExcUnits))) stop('[SelEditUnitAllocation:AllocateUnits] Statistical units in object and Param are specified in the same way.\n')
-    Units <- lapply(Units, function(DT){
 
+    Units <- lapply(seq(along = Units), function(i){
+
+      DT <- copy(Units[[i]])[, Priority := object@UnitPriority[[i]]]
+      DT <- DT[, Score := object@UnitScores[[i]]]
       setkeyv(DT, names(DT))
       out <- DT[!ExcUnits]
+      setkeyv(out, 'Priority')
+      out[, NewPriority := seq(along = Priority)][, Priority := NULL]
+      setnames(out, 'NewPriority', 'Priority')
+      setkeyv(out, setdiff(names(out), c('Score', 'Priority')))
+      return(out)
+    })
+
+
+    Priority <- lapply(seq(along = Units), function(index){
+
+      out <- Units[[index]][['Priority']]
+      Units[[index]][, Priority := NULL]
+      return(out)
+    })
+
+    ScoreNoZero <- lapply(seq(along = Units), function(index){
+
+      out <- Units[[index]][Score > 0]
+      out <- dim(out)[1]
+      Units[[index]][, Score := NULL]
       return(out)
     })
 
@@ -84,37 +107,6 @@ setMethod(
 
 
     nFactors <- length(FactorList)
-    Priority <- lapply(seq(along = object@Units), function(index){
-      out <- copy(object@Units[[index]])
-      out <- out[object@UnitPriority[[index]]]
-      #out[, Priority := object@UnitPriority[[index]]]
-      out[, NewPriority := seq(along = out[[1]])]
-      out <- merge(out, Units[[index]], by =  names(Units[[index]]))
-      setkeyv(out, 'NewPriority')
-      out[, Priority := seq(along = out[[1]])]
-      out[, NewPriority := NULL]
-      setkeyv(out, setdiff(names(out), 'Priority'))
-      out <- out[['Priority']]
-      return(out)
-    })
-
-#    if (all(ndep >= CellSize)) {
-
-#      Allocation <- CellSize
-#return(list(Priority, Allocation))
-#      outputUnits <- lapply(seq(along = Units), function(indexDomain){
-
-#        indexSelectedUnits <- which(Priority[[indexDomain]] <= Allocation[indexDomain])
-#return(indexSelectedUnits)
-#        outLocal <- Units[[indexDomain]][indexSelectedUnits]
-#        return(outLocal)
-
-#      })
-#return(outputUnits)
-#      output <- new(Class = 'AllocatedUnits', Domains = object@Domains, Units = outputUnits)
-#      return(output)
-
-#    }
 
     if (sum(nmin) > ndep) stop("[SelEditUnitAllocation::AllocateUnits] The sum of AllocMin exceeds the maximum number of units to allocate MaxUnits.")
 
@@ -134,32 +126,37 @@ setMethod(
     increment[incomplete] <- as.integer(floor(PropConst[incomplete] * remainder))
     increment[increment < 0] <- 0L
     Allocation <- Allocation + increment
+    Order.dt <- data.table(PropConst = PropConst, ScoreNoZero = ScoreNoZero, Cell = paste0('Dom', seq(along = PropConst)))
 
-    Allocation[Allocation >= CellSize] <- CellSize[Allocation >= CellSize]
+    Allocation[Allocation >= Order.dt$ScoreNoZero] <- unlist(Order.dt$ScoreNoZero[Allocation >= Order.dt$ScoreNoZero])
     remainder <- ndep - sum(Allocation)
     while (any(increment > 0)){
-      complete <- which(Allocation == CellSize)
-      incomplete <- which(Allocation != CellSize)
+      complete <- which(Allocation == Order.dt$ScoreNoZero)
+      incomplete <- which(Allocation != Order.dt$ScoreNoZero)
       increment <- integer(nCells)
       increment[incomplete] <- as.integer(floor(PropConst[incomplete] * remainder))
       increment[increment < 0] <- 0L
       Allocation <- Allocation + increment
-
-      Allocation[Allocation >= CellSize] <- CellSize[Allocation >= CellSize]
+      Allocation[Allocation > Order.dt$ScoreNoZero] <- unlist(Order.dt$ScoreNoZero[Allocation > Order.dt$ScoreNoZero])
       remainder <- ndep - sum(Allocation)
     }
     if (remainder == 0) return(Allocation)
 
-    Order.PropConst <- order(PropConst, decreasing = T)
     names(Allocation) <- paste0('Dom', seq(along = Allocation))
-    Order.Cells <- names(Allocation)[Order.PropConst]
+    setkeyv(Order.dt, 'PropConst')
+    Order.dt[, Order := rev(seq(along = PropConst))]
+
+
+    Order.Cells <- Order.dt$Cell[Order.dt$Order]
+    ScoreNoZero.Cells <- unlist(Order.dt$ScoreNoZero[Order.dt$Order])
     Counter <- 1L
     while (remainder > 0){
       increment <- integer(nCells)
       names(increment) <- names(Allocation)
-      increment[Order.Cells[Counter]] <- 1L
+      if (ScoreNoZero.Cells[Counter] > Allocation[Order.Cells[Counter]]) increment[Order.Cells[Counter]] <- 1L
       Allocation <- Allocation + increment
       remainder <- ndep - sum(Allocation)
+
       if (Counter == length(Allocation)) {
 
         Counter <- 1L
